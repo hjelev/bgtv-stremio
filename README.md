@@ -1,4 +1,4 @@
-# BG Live TV (SeirSanduk) — Stremio Addon
+# BG Live TV — Stremio Addon
 
 A Stremio addon that scrapes live Bulgarian TV channels from [seirsanduk.online](https://www.seirsanduk.online/) and serves them as a `tv` catalog with playable HLS streams.
 
@@ -31,13 +31,13 @@ docker compose logs -f     # follow logs
 ### Build the image
 
 ```bash
-docker build -t stremio-seirsanduk .
+docker build -t stremio-bgtv .
 ```
 
 ### Run the container
 
 ```bash
-docker run -d --name stremio-seirsanduk -p 7000:7000 --restart unless-stopped stremio-seirsanduk
+docker run -d --name stremio-bgtv -p 7000:7000 --restart unless-stopped stremio-bgtv
 ```
 
 The addon is now running at `http://localhost:7000`.
@@ -45,8 +45,8 @@ The addon is now running at `http://localhost:7000`.
 ### Stop / remove
 
 ```bash
-docker stop stremio-seirsanduk
-docker rm stremio-seirsanduk
+docker stop stremio-bgtv
+docker rm stremio-bgtv
 ```
 
 ---
@@ -116,8 +116,8 @@ To install on a TV or another device on the same network, replace `localhost` wi
 
 | Field | Value |
 |---|---|
-| ID | `org.custom.seirsanduk` |
+| ID | `org.custom.bgtv` |
 | Type | `tv` |
 | Catalog ID | `bg_tv` |
-| ID prefix | `seir_` |
+| ID prefix | `bgtv_` |
 | Port | `7000` |

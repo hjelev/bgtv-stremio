@@ -49,7 +49,7 @@ async function getCatalog() {
 
     const poster = imageUrl(thumb);
     channels.push({
-      id: 'seir_' + channelId,
+      id: 'bgtv_' + channelId,
       type: 'tv',
       name: name || channelId,
       poster,
@@ -72,7 +72,7 @@ async function getChannelById(id) {
 }
 
 async function getStream(channelId) {
-  // channelId is the part after "seir_"
+  // channelId is the part after "bgtv_"
   const url = `${BASE_URL}/?id=${channelId}`;
   const resp = await axios.get(url, { headers: HEADERS, timeout: 15000 });
   const html = resp.data;

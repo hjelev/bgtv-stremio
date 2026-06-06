@@ -7,7 +7,7 @@ const getRouter = require('stremio-addon-sdk/src/getRouter');
 const { getCatalog, getChannelById, getStream } = require('./scraper');
 
 const manifest = {
-  id: 'org.custom.seirsanduk',
+  id: 'org.custom.bgtv',
   version: '1.0.0',
   name: 'BG Live TV',
   description: 'Live Bulgarian TV channels',
@@ -17,7 +17,7 @@ const manifest = {
     { type: 'tv', id: 'bg_tv', name: 'BG Live TV' }
   ],
   resources: ['catalog', 'meta', 'stream'],
-  idPrefixes: ['seir_'],
+  idPrefixes: ['bgtv_'],
 };
 
 const builder = new addonBuilder(manifest);
@@ -34,7 +34,7 @@ builder.defineCatalogHandler(async ({ type, id }) => {
 });
 
 builder.defineMetaHandler(async ({ type, id }) => {
-  if (type !== 'tv' || !id.startsWith('seir_')) return { meta: null };
+  if (type !== 'tv' || !id.startsWith('bgtv_')) return { meta: null };
   try {
     const channel = await getChannelById(id);
     if (!channel) return { meta: null };
@@ -57,8 +57,8 @@ builder.defineMetaHandler(async ({ type, id }) => {
 });
 
 builder.defineStreamHandler(async ({ type, id }) => {
-  if (type !== 'tv' || !id.startsWith('seir_')) return { streams: [] };
-  const channelId = id.slice('seir_'.length);
+  if (type !== 'tv' || !id.startsWith('bgtv_')) return { streams: [] };
+  const channelId = id.slice('bgtv_'.length);
   try {
     const url = await getStream(channelId);
     if (!url) return { streams: [] };

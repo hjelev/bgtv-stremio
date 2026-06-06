@@ -578,7 +578,7 @@ docker compose pull         # pull latest image</pre>
         </div>
         <pre>git clone https://github.com/hjelev/bgtv-stremio.git
 cd bgtv-stremio
-docker build -t stremio-seirsanduk .</pre>
+docker build -t stremio-bgtv .</pre>
       </div>
 
       <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">2. Run the container</p>
@@ -588,10 +588,10 @@ docker build -t stremio-seirsanduk .</pre>
           <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
         </div>
         <pre>docker run -d \
-  --name stremio-seirsanduk \
+  --name stremio-bgtv \
   -p 7000:7000 \
   --restart unless-stopped \
-  stremio-seirsanduk</pre>
+  stremio-bgtv</pre>
       </div>
       <p class="code-note">The addon starts at <code style="color:var(--accent-bright)">http://localhost:7000</code></p>
 
@@ -601,8 +601,8 @@ docker build -t stremio-seirsanduk .</pre>
           <span>bash</span>
           <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
         </div>
-        <pre>docker stop stremio-seirsanduk
-docker rm stremio-seirsanduk</pre>
+        <pre>docker stop stremio-bgtv
+docker rm stremio-bgtv</pre>
       </div>
     </div>
 
@@ -739,12 +739,12 @@ npm install</pre>
           </tr>
         </thead>
         <tbody>
-          <tr><td>ID</td><td><code>org.custom.seirsanduk</code></td></tr>
-          <tr><td>Name</td><td>BG Live TV (SeirSanduk)</td></tr>
+          <tr><td>ID</td><td><code>org.custom.bgtv</code></td></tr>
+          <tr><td>Name</td><td>BG Live TV</td></tr>
           <tr><td>Version</td><td><code>1.0.0</code></td></tr>
           <tr><td>Type</td><td><code>tv</code></td></tr>
           <tr><td>Catalog ID</td><td><code>bg_tv</code></td></tr>
-          <tr><td>ID prefix</td><td><code>seir_</code></td></tr>
+          <tr><td>ID prefix</td><td><code>bgtv_</code></td></tr>
           <tr><td>Resources</td><td><code>catalog</code>, <code>meta</code>, <code>stream</code></td></tr>
           <tr><td>Default port</td><td><code>7000</code></td></tr>
         </tbody>
