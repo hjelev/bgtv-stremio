@@ -33,6 +33,20 @@
       background: radial-gradient(ellipse 80% 60% at 50% 0%, #2a1a4a 0%, transparent 70%);
     }
 
+    .hero-title-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .hero-logo {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
     .badge {
       display: inline-block;
       background: rgba(123, 94, 167, 0.25);
@@ -55,7 +69,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 16px;
+      margin: 0;
     }
 
     .hero p {
@@ -276,9 +290,15 @@
 
   <!-- HERO -->
   <section class="hero">
-    <div class="badge">Stremio Addon</div>
-    <h1>BG Live TV</h1>
-    <p>65+ Bulgarian live TV channels — BTV, BNT, Nova, Eurosport, Max Sport and more — directly in Stremio. Free, no account needed.</p>
+    
+    <div class="hero-title-row">
+      <img src="/images/logo.png" alt="BG Live TV Logo" class="hero-logo" />
+      <h1>BG Live TV</h1>
+    </div>
+    <br/>
+    <div class="badge">Stremio Addon</div> 
+      
+    <p> 65+ Bulgarian live TV channels — BTV, BNT, Nova, Eurosport, Max Sport and more — directly in Stremio. Free, no account needed.</p>
 
     <div class="install-box">
       <div class="install-label">Manifest URL</div>
