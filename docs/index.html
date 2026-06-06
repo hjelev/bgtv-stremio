@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BG Live TV — Stremio Addon</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f13;
+      --surface: #18181f;
+      --surface2: #1e1e27;
+      --border: #2a2a35;
+      --accent: #7b5ea7;
+      --accent-bright: #a97fd4;
+      --text: #e8e8f0;
+      --muted: #888899;
+      --green: #4caf7d;
+      --code-bg: #12121a;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent-bright); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 15, 19, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-brand img { width: 28px; height: 28px; object-fit: contain; }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+      font-size: 0.875rem;
+    }
+
+    .nav-links a { color: var(--muted); }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 96px 24px 72px;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, #2a1a4a 0%, transparent 70%);
+    }
+
+    .hero-logo {
+      width: 96px;
+      height: 96px;
+      object-fit: contain;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 0 32px rgba(169, 127, 212, 0.4));
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(123, 94, 167, 0.2);
+      border: 1px solid var(--accent);
+      color: var(--accent-bright);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent-bright));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 540px;
+      margin: 0 auto 40px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: 9px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      border: none;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:hover { opacity: 0.85; text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #5a3d8a);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    /* ── SECTION ── */
+    .section {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 72px 24px;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-bright);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 36px;
+    }
+
+    .divider { border: none; border-top: 1px solid var(--border); }
+
+    /* ── FEATURES ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    .feature {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 20px;
+      transition: border-color 0.2s;
+    }
+    .feature:hover { border-color: var(--accent); }
+
+    .feature-icon { font-size: 1.8rem; margin-bottom: 14px; }
+    .feature h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
+    .feature p { font-size: 0.85rem; color: var(--muted); }
+
+    /* ── INSTALL TABS ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 24px;
+      width: fit-content;
+    }
+
+    .tab-btn {
+      padding: 8px 20px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── CODE BLOCKS ── */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    .copy-code-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 5px;
+      padding: 3px 10px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .copy-code-btn:hover { border-color: var(--accent); color: var(--accent-bright); }
+    .copy-code-btn.copied { border-color: var(--green); color: var(--green); }
+
+    pre {
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+
+    .code-note {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: -8px;
+      margin-bottom: 20px;
+    }
+
+    /* ── STEPS ── */
+    .steps { display: flex; flex-direction: column; gap: 20px; }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .step-body h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
+    .step-body p  { font-size: 0.85rem; color: var(--muted); }
+    .step-body code {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.82rem;
+      color: var(--accent-bright);
+    }
+
+    /* ── STREMIO INSTALL BOX ── */
+    .install-callout {
+      background: linear-gradient(135deg, rgba(123, 94, 167, 0.15), rgba(90, 61, 138, 0.1));
+      border: 1px solid rgba(123, 94, 167, 0.4);
+      border-radius: 14px;
+      padding: 28px 28px;
+      margin-bottom: 24px;
+    }
+
+    .install-callout h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .url-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .url-display {
+      flex: 1;
+      min-width: 240px;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: var(--accent-bright);
+    }
+
+    .btn-copy {
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+    .btn-copy:hover { opacity: 0.85; }
+    .btn-copy.copied { background: var(--green); }
+
+    .install-hint { font-size: 0.82rem; color: var(--muted); }
+
+    /* ── MANIFEST TABLE ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 16px;
+      border-bottom: 2px solid var(--border);
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td:first-child { color: var(--muted); font-size: 0.82rem; }
+    td code {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 0.8rem;
+      color: var(--accent-bright);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 36px 24px;
+      border-top: 1px solid var(--border);
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--accent-bright); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .hero { padding: 64px 20px 48px; }
+      .section { padding: 48px 20px; }
+      .tabs { width: 100%; }
+      .tab-btn { flex: 1; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-brand" href="#">
+      <img src="logo.png" alt="Logo" />
+      BG Live TV
+    </a>
+    <ul class="nav-links">
+      <li><a href="#install">Install</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="https://github.com/hjelev/bgtv-stremio" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <img src="logo.png" alt="BG Live TV Logo" class="hero-logo" />
+    <div class="badge">Stremio Addon</div>
+    <h1>BG Live TV</h1>
+    <p class="hero-sub">65+ Bulgarian live TV channels — BTV, BNT, Nova, Eurosport, Max Sport and more — directly in Stremio. Free, no account needed.</p>
+    <div class="hero-actions">
+      <a href="#install" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Get Started
+      </a>
+      <a href="https://github.com/hjelev/bgtv-stremio" target="_blank" rel="noopener" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- FEATURES -->
+  <div class="section" id="features">
+    <div class="section-label">What you get</div>
+    <div class="section-title">Features</div>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">📺</div>
+        <h3>65+ Live Channels</h3>
+        <p>Full Bulgarian TV lineup — news, sports, entertainment, kids, and more.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <h3>HLS Streams</h3>
+        <p>High-quality <code>.m3u8</code> streams fetched fresh on every play request.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📱</div>
+        <h3>All Devices</h3>
+        <p>Works on PC, Android TV, Fire TV Stick, and any Stremio client.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔓</div>
+        <h3>No Account</h3>
+        <p>No registration, no subscription. Self-hosted on your own server.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🐳</div>
+        <h3>Docker Ready</h3>
+        <p>One command to spin up with Docker Compose. Zero config needed.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🖼️</div>
+        <h3>Channel Logos</h3>
+        <p>All channel logos downloaded locally — no external image dependencies.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- INSTALLATION -->
+  <div class="section" id="install">
+    <div class="section-label">Setup</div>
+    <div class="section-title">Installation</div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('docker-compose')">Docker Compose</button>
+      <button class="tab-btn" onclick="showTab('docker')">Docker</button>
+      <button class="tab-btn" onclick="showTab('nodejs')">Node.js</button>
+    </div>
+
+    <!-- Docker Compose -->
+    <div class="tab-panel active" id="tab-docker-compose">
+      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:20px;">The recommended way. Requires <a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">Docker Compose</a>.</p>
+
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">1. Clone the repository</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>git clone https://github.com/hjelev/bgtv-stremio.git
+cd bgtv-stremio</pre>
+      </div>
+
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">2. Start the addon</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>docker compose up -d --build</pre>
+      </div>
+      <p class="code-note">The addon starts at <code style="color:var(--accent-bright)">http://localhost:7000</code></p>
+
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">Useful commands</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>docker compose logs -f      # follow logs
+docker compose down         # stop and remove the container
+docker compose pull         # pull latest image</pre>
+      </div>
+    </div>
+
+    <!-- Docker standalone -->
+    <div class="tab-panel" id="tab-docker">
+      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:20px;">Requires <a href="https://docs.docker.com/get-docker/" target="_blank" rel="noopener">Docker</a>.</p>
+
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">1. Build the image</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>git clone https://github.com/hjelev/bgtv-stremio.git
+cd bgtv-stremio
+docker build -t stremio-seirsanduk .</pre>
+      </div>
+
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">2. Run the container</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>docker run -d \
+  --name stremio-seirsanduk \
+  -p 7000:7000 \
+  --restart unless-stopped \
+  stremio-seirsanduk</pre>
+      </div>
+      <p class="code-note">The addon starts at <code style="color:var(--accent-bright)">http://localhost:7000</code></p>
+
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">Stop / remove</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>docker stop stremio-seirsanduk
+docker rm stremio-seirsanduk</pre>
+      </div>
+    </div>
+
+    <!-- Node.js -->
+    <div class="tab-panel" id="tab-nodejs">
+      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:20px;">Requires <a href="https://nodejs.org/" target="_blank" rel="noopener">Node.js</a> v18+ (use <a href="https://github.com/nvm-sh/nvm" target="_blank" rel="noopener">nvm</a> if needed).</p>
+
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">1. Clone and install dependencies</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>git clone https://github.com/hjelev/bgtv-stremio.git
+cd bgtv-stremio
+npm install</pre>
+      </div>
+
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">2. Download channel logos</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>npm run download-images</pre>
+      </div>
+      <p class="code-note">Downloads all 65 channel logos to <code style="color:var(--accent-bright)">public/images/tvlogo/</code></p>
+
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">3. Start the server</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>npm start</pre>
+      </div>
+      <p class="code-note">The addon starts at <code style="color:var(--accent-bright)">http://localhost:7000</code></p>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- STREMIO INSTALL -->
+  <div class="section">
+    <div class="section-label">Add to Stremio</div>
+    <div class="section-title">Installing the Addon</div>
+
+    <div class="install-callout">
+      <h3>Manifest URL</h3>
+      <div class="url-row">
+        <div class="url-display">http://localhost:7000/manifest.json</div>
+        <button class="btn-copy" id="copy-manifest-btn" onclick="copyManifest()">Copy URL</button>
+      </div>
+      <p class="install-hint">Replace <code>localhost</code> with your server's local IP to install from another device on the same network (e.g. <code>http://192.168.1.x:7000/manifest.json</code>).</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Open Stremio</h3>
+          <p>Launch the Stremio app on any of your devices — PC, Android TV, Fire TV Stick, etc.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Go to Addons</h3>
+          <p>Click the puzzle-piece icon or navigate to <strong>Addons → Community Addons → Install from URL</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Paste the manifest URL</h3>
+          <p>Enter <code>http://localhost:7000/manifest.json</code> (or your server's IP) and click <strong>Install</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Watch live TV</h3>
+          <p>Go to the <strong>TV</strong> section in Stremio — your Bulgarian live channels will appear under the <em>BG Live TV</em> catalog.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- HOW IT WORKS -->
+  <div class="section" id="how-it-works">
+    <div class="section-label">Under the hood</div>
+    <div class="section-title">How it works</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Catalog</h3>
+          <p>The addon scrapes the channel list from the source site with <code>cheerio</code> and serves it as a Stremio TV catalog — complete with channel names and logos. Results are cached for 1 hour.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Stream extraction</h3>
+          <p>When you pick a channel, the addon fetches that channel's page and extracts the embedded HLS stream URL from the JWPlayer <code>file:"…"</code> script via regex — in real time.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Playback</h3>
+          <p>Stremio receives a fresh, time-limited <code>.m3u8</code> URL and starts playback immediately — no buffering layers or intermediaries.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- MANIFEST -->
+  <div class="section">
+    <div class="section-label">Technical details</div>
+    <div class="section-title">Addon Manifest</div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>ID</td><td><code>org.custom.seirsanduk</code></td></tr>
+          <tr><td>Name</td><td>BG Live TV (SeirSanduk)</td></tr>
+          <tr><td>Version</td><td><code>1.0.0</code></td></tr>
+          <tr><td>Type</td><td><code>tv</code></td></tr>
+          <tr><td>Catalog ID</td><td><code>bg_tv</code></td></tr>
+          <tr><td>ID prefix</td><td><code>seir_</code></td></tr>
+          <tr><td>Resources</td><td><code>catalog</code>, <code>meta</code>, <code>stream</code></td></tr>
+          <tr><td>Default port</td><td><code>7000</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- FOOTER -->
+  <footer>
+    BG Live TV Stremio Addon &mdash; self-hosted, open source &mdash;
+    <a href="https://github.com/hjelev/bgtv-stremio" target="_blank" rel="noopener">GitHub</a>
+  </footer>
+
+  <script>
+    function showTab(id) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + id).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function copyCode(btn) {
+      const pre = btn.closest('.code-block').querySelector('pre');
+      navigator.clipboard.writeText(pre.textContent.trim()).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    function copyManifest() {
+      navigator.clipboard.writeText('http://localhost:7000/manifest.json').then(() => {
+        const btn = document.getElementById('copy-manifest-btn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy URL'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
