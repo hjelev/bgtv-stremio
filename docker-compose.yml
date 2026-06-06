@@ -1,0 +1,9 @@
+services:
+  stremio-bgtv:
+    build: .
+    container_name: stremio-bgtv
+    ports:
+      - "7000:7000"
+    restart: unless-stopped
+    environment:
+      - PORT=7000

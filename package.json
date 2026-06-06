@@ -1,0 +1,21 @@
+{
+  "name": "stremio-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "download-images": "node scripts/download-images.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.17.0",
+    "cheerio": "^1.2.0",
+    "express": "^5.2.1",
+    "stremio-addon-sdk": "^1.6.10"
+  }
+}
