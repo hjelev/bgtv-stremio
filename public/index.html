@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BG Live TV — Stremio Addon</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f13;
+      --surface: #18181f;
+      --border: #2a2a35;
+      --accent: #7b5ea7;
+      --accent-bright: #a97fd4;
+      --text: #e8e8f0;
+      --muted: #888899;
+      --green: #4caf7d;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 80px 20px 60px;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, #2a1a4a 0%, transparent 70%);
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(123, 94, 167, 0.25);
+      border: 1px solid var(--accent);
+      color: var(--accent-bright);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 40%, var(--accent-bright));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 40px;
+    }
+
+    /* ── INSTALL BOX ── */
+    .install-box {
+      max-width: 580px;
+      margin: 0 auto 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+
+    .install-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .url-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .url-display {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: var(--accent-bright);
+      word-break: break-all;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      border: none;
+      white-space: nowrap;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-copy {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-copy.copied {
+      background: var(--green);
+    }
+
+    .btn-install {
+      background: linear-gradient(135deg, #7b5ea7, #5a3d8a);
+      color: #fff;
+      font-size: 1rem;
+      padding: 13px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 12px;
+    }
+    .hint a { color: var(--accent-bright); text-decoration: none; }
+    .hint a:hover { text-decoration: underline; }
+
+    /* ── FEATURES ── */
+    .section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+      color: var(--text);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .feature {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .feature-icon {
+      font-size: 1.6rem;
+      margin-bottom: 12px;
+    }
+
+    .feature h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .feature p {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* ── CHANNELS ── */
+    .channels-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+      gap: 12px;
+    }
+
+    .channel-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+      transition: border-color 0.15s;
+    }
+    .channel-card:hover { border-color: var(--accent); }
+
+    .channel-card img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: #111;
+    }
+
+    .channel-card span {
+      display: block;
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-top: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .channels-loader {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .step-body h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+    .step-body p  { font-size: 0.85rem; color: var(--muted); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 32px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="badge">Stremio Addon</div>
+    <h1>BG Live TV</h1>
+    <p>65+ Bulgarian live TV channels — BTV, BNT, Nova, Eurosport, Max Sport and more — directly in Stremio. Free, no account needed.</p>
+
+    <div class="install-box">
+      <div class="install-label">Manifest URL</div>
+      <div class="url-row">
+        <div class="url-display" id="manifest-url">loading…</div>
+        <button class="btn btn-copy" id="copy-btn" onclick="copyUrl()">Copy</button>
+      </div>
+      <p class="hint">
+        Open Stremio → Addons → <strong style="color:var(--text)">Install from URL</strong> → paste the URL above.<br>
+        Or <a href="#" id="stremio-link">click here</a> to install automatically.
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- FEATURES -->
+  <div class="section">
+    <div class="section-title">Features</div>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">📺</div>
+        <h3>65+ Live Channels</h3>
+        <p>Full Bulgarian TV lineup — news, sports, entertainment, kids.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <h3>HLS Streams</h3>
+        <p>High-quality .m3u8 streams fetched fresh on every play request.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📱</div>
+        <h3>All Devices</h3>
+        <p>Works on PC, Android TV, Fire TV Stick, and any Stremio client.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔓</div>
+        <h3>No Account</h3>
+        <p>No registration, no subscription. Self-hosted on your own server.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- CHANNELS -->
+  <div class="section">
+    <div class="section-title">Available Channels</div>
+    <div class="channels-grid" id="channels-grid">
+      <p class="channels-loader">Loading channels…</p>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- HOW IT WORKS -->
+  <div class="section">
+    <div class="section-title">How it works</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Catalog</h3>
+          <p>The addon scrapes the channel list from the source site and serves it as a Stremio TV catalog — with names and logos.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Stream extraction</h3>
+          <p>When you pick a channel, the addon fetches that channel's page and extracts the embedded HLS stream URL in real time.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Playback</h3>
+          <p>Stremio receives a fresh, time-limited .m3u8 URL and starts playback immediately — no buffering layers or intermediaries.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <footer>
+    BG Live TV Stremio Addon &mdash; self-hosted, open source
+  </footer>
+
+  <script>
+    // Set manifest URL dynamically based on how this page was reached
+    const manifestUrl = window.location.origin + '/manifest.json';
+    document.getElementById('manifest-url').textContent = manifestUrl;
+    document.getElementById('stremio-link').href = 'stremio://' + window.location.host + '/manifest.json';
+
+    function copyUrl() {
+      navigator.clipboard.writeText(manifestUrl).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    // Load channels from the catalog endpoint
+    fetch('/catalog/tv/bg_tv.json')
+      .then(r => r.json())
+      .then(data => {
+        const grid = document.getElementById('channels-grid');
+        const metas = data.metas || [];
+        if (!metas.length) { grid.innerHTML = '<p class="channels-loader">No channels found.</p>'; return; }
+        grid.innerHTML = metas.map(ch => `
+          <div class="channel-card">
+            <img src="${ch.logo}" alt="${ch.name}" loading="lazy" onerror="this.style.display='none'">
+            <span>${ch.name}</span>
+          </div>
+        `).join('');
+      })
+      .catch(() => {
+        document.getElementById('channels-grid').innerHTML = '<p class="channels-loader">Could not load channels.</p>';
+      });
+  </script>
+</body>
+</html>
