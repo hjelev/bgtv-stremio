@@ -3,445 +3,57 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BG Live TV — Stremio Addon</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <title>BG Live TV — Bulgarian Live TV Stremio Addon</title>
+  <meta name="description" content="65+ Bulgarian live TV channels — BTV, BNT, Nova, Eurosport, Max Sport and more — directly in Stremio. Free, self-hosted, no account needed." />
+  <meta name="keywords" content="Stremio addon, Bulgarian TV, live TV, BTV, BNT, Nova, Eurosport, Max Sport, IPTV, HLS, m3u8, self-hosted" />
+  <meta name="author" content="hjelev" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0f0f13" />
+  <link rel="canonical" href="https://masoko.net/bgtv-stremio/" />
+  <link rel="icon" href="logo.png" type="image/png" />
 
-    :root {
-      --bg: #0f0f13;
-      --surface: #18181f;
-      --surface2: #1e1e27;
-      --border: #2a2a35;
-      --accent: #7b5ea7;
-      --accent-bright: #a97fd4;
-      --text: #e8e8f0;
-      --muted: #888899;
-      --green: #4caf7d;
-      --code-bg: #12121a;
-    }
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="BG Live TV" />
+  <meta property="og:title" content="BG Live TV — Bulgarian Live TV Stremio Addon" />
+  <meta property="og:description" content="65+ Bulgarian live TV channels — BTV, BNT, Nova, Eurosport, Max Sport and more — directly in Stremio. Free, self-hosted, no account needed." />
+  <meta property="og:url" content="https://masoko.net/bgtv-stremio/" />
+  <meta property="og:image" content="https://masoko.net/bgtv-stremio/logo.png" />
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="BG Live TV — Bulgarian Live TV Stremio Addon" />
+  <meta name="twitter:description" content="65+ Bulgarian live TV channels — BTV, BNT, Nova, Eurosport, Max Sport and more — directly in Stremio. Free, self-hosted, no account needed." />
+  <meta name="twitter:image" content="https://masoko.net/bgtv-stremio/logo.png" />
 
-    a { color: var(--accent-bright); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "BG Live TV",
+    "description": "65+ Bulgarian live TV channels — BTV, BNT, Nova, Eurosport, Max Sport and more — directly in Stremio. Free, self-hosted, no account needed.",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Cross-platform",
+    "url": "https://masoko.net/bgtv-stremio/",
+    "image": "https://masoko.net/bgtv-stremio/logo.png",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "sameAs": "https://github.com/hjelev/bgtv-stremio"
+  }
+  </script>
 
-    /* ── NAV ── */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(15, 15, 19, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 56px;
-    }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      color: var(--text);
-      text-decoration: none;
-    }
-
-    .nav-brand img { width: 28px; height: 28px; object-fit: contain; }
-
-    .nav-links {
-      display: flex;
-      gap: 24px;
-      list-style: none;
-      font-size: 0.875rem;
-    }
-
-    .nav-links a { color: var(--muted); }
-    .nav-links a:hover { color: var(--text); text-decoration: none; }
-
-    /* ── HERO ── */
-    .hero {
-      text-align: center;
-      padding: 96px 24px 72px;
-      background: radial-gradient(ellipse 80% 60% at 50% 0%, #2a1a4a 0%, transparent 70%);
-    }
-
-    .hero-title-row {
-      display: inline-flex;
-      align-items: center;
-      gap: 20px;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-
-    .hero-logo {
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
-      flex-shrink: 0;
-      filter: drop-shadow(0 0 32px rgba(169, 127, 212, 0.4));
-    }
-
-    .badge {
-      display: inline-block;
-      background: rgba(123, 94, 167, 0.2);
-      border: 1px solid var(--accent);
-      color: var(--accent-bright);
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 4px 14px;
-      border-radius: 20px;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      font-size: clamp(2.2rem, 5vw, 3.5rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #ffffff 40%, var(--accent-bright));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0;
-    }
-
-    .hero-sub {
-      font-size: 1.1rem;
-      color: var(--muted);
-      max-width: 540px;
-      margin: 0 auto 40px;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 11px 22px;
-      border-radius: 9px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
-      border: none;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-    .btn:hover { opacity: 0.85; text-decoration: none; }
-    .btn:active { transform: scale(0.97); }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #5a3d8a);
-      color: #fff;
-    }
-
-    .btn-secondary {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    /* ── SECTION ── */
-    .section {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 72px 24px;
-    }
-
-    .section-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent-bright);
-      margin-bottom: 10px;
-    }
-
-    .section-title {
-      font-size: 1.7rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 36px;
-    }
-
-    .divider { border: none; border-top: 1px solid var(--border); }
-
-    /* ── FEATURES ── */
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 14px;
-    }
-
-    .feature {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 22px 20px;
-      transition: border-color 0.2s;
-    }
-    .feature:hover { border-color: var(--accent); }
-
-    .feature-icon { font-size: 1.8rem; margin-bottom: 14px; }
-    .feature h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
-    .feature p { font-size: 0.85rem; color: var(--muted); }
-
-    /* ── INSTALL TABS ── */
-    .tabs {
-      display: flex;
-      gap: 4px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 24px;
-      width: fit-content;
-    }
-
-    .tab-btn {
-      padding: 8px 20px;
-      border-radius: 7px;
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      font-size: 0.875rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-    }
-    .tab-btn.active {
-      background: var(--accent);
-      color: #fff;
-    }
-
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-
-    /* ── CODE BLOCKS ── */
-    .code-block {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-
-    .code-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.75rem;
-      color: var(--muted);
-      font-family: 'SF Mono', 'Fira Code', monospace;
-    }
-
-    .copy-code-btn {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      border-radius: 5px;
-      padding: 3px 10px;
-      font-size: 0.7rem;
-      cursor: pointer;
-      transition: border-color 0.15s, color 0.15s;
-    }
-    .copy-code-btn:hover { border-color: var(--accent); color: var(--accent-bright); }
-    .copy-code-btn.copied { border-color: var(--green); color: var(--green); }
-
-    pre {
-      padding: 18px 20px;
-      overflow-x: auto;
-      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-      font-size: 0.85rem;
-      line-height: 1.7;
-      color: var(--text);
-    }
-
-    code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
-
-    .code-note {
-      font-size: 0.82rem;
-      color: var(--muted);
-      margin-top: -8px;
-      margin-bottom: 20px;
-    }
-
-    /* ── STEPS ── */
-    .steps { display: flex; flex-direction: column; gap: 20px; }
-
-    .step {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-    }
-
-    .step-num {
-      flex-shrink: 0;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .step-body h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; }
-    .step-body p  { font-size: 0.85rem; color: var(--muted); }
-    .step-body code {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 1px 6px;
-      font-size: 0.82rem;
-      color: var(--accent-bright);
-    }
-
-    /* ── STREMIO INSTALL BOX ── */
-    .install-callout {
-      background: linear-gradient(135deg, rgba(123, 94, 167, 0.15), rgba(90, 61, 138, 0.1));
-      border: 1px solid rgba(123, 94, 167, 0.4);
-      border-radius: 14px;
-      padding: 28px 28px;
-      margin-bottom: 24px;
-    }
-
-    .install-callout h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-    }
-
-    .url-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-
-    .url-display {
-      flex: 1;
-      min-width: 240px;
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 0.85rem;
-      color: var(--accent-bright);
-    }
-
-    .btn-copy {
-      background: var(--accent);
-      color: #fff;
-      padding: 10px 16px;
-      border-radius: 8px;
-      border: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.15s;
-      white-space: nowrap;
-    }
-    .btn-copy:hover { opacity: 0.85; }
-    .btn-copy.copied { background: var(--green); }
-
-    .install-hint { font-size: 0.82rem; color: var(--muted); }
-
-    /* ── MANIFEST TABLE ── */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-    }
-
-    th {
-      text-align: left;
-      padding: 10px 16px;
-      border-bottom: 2px solid var(--border);
-      color: var(--muted);
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    td {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    td:first-child { color: var(--muted); font-size: 0.82rem; }
-    td code {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 2px 7px;
-      font-size: 0.8rem;
-      color: var(--accent-bright);
-    }
-
-    tr:last-child td { border-bottom: none; }
-    .table-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      text-align: center;
-      padding: 36px 24px;
-      border-top: 1px solid var(--border);
-      font-size: 0.82rem;
-      color: var(--muted);
-    }
-    footer a { color: var(--accent-bright); }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 600px) {
-      .nav-links { display: none; }
-      .hero { padding: 64px 20px 48px; }
-      .section { padding: 48px 20px; }
-      .tabs { width: 100%; }
-      .tab-btn { flex: 1; text-align: center; }
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
   <!-- NAV -->
   <nav>
-    <a class="nav-brand" href="#">
-      <img src="logo.png" alt="Logo" />
+    <a class="nav-brand" href="/bgtv-stremio/">
+      <img src="logo.png" alt="BG Live TV logo" />
       BG Live TV
     </a>
     <ul class="nav-links">
@@ -482,7 +94,7 @@
   <!-- FEATURES -->
   <div class="section" id="features">
     <div class="section-label">What you get</div>
-    <div class="section-title">Features</div>
+    <h2 class="section-title">Features</h2>
     <div class="features">
       <div class="feature">
         <div class="feature-icon">📺</div>
@@ -522,7 +134,7 @@
   <!-- INSTALLATION -->
   <div class="section" id="install">
     <div class="section-label">Setup</div>
-    <div class="section-title">Installation</div>
+    <h2 class="section-title">Installation</h2>
 
     <div class="tabs">
       <button class="tab-btn active" onclick="showTab('docker-compose')">Docker Compose</button>
@@ -648,7 +260,7 @@ npm install</pre>
   <!-- STREMIO INSTALL -->
   <div class="section">
     <div class="section-label">Add to Stremio</div>
-    <div class="section-title">Installing the Addon</div>
+    <h2 class="section-title">Installing the Addon</h2>
 
     <div class="install-callout">
       <h3>Manifest URL</h3>
@@ -696,7 +308,7 @@ npm install</pre>
   <!-- HOW IT WORKS -->
   <div class="section" id="how-it-works">
     <div class="section-label">Under the hood</div>
-    <div class="section-title">How it works</div>
+    <h2 class="section-title">How it works</h2>
 
     <div class="steps">
       <div class="step">
@@ -728,7 +340,7 @@ npm install</pre>
   <!-- MANIFEST -->
   <div class="section">
     <div class="section-label">Technical details</div>
-    <div class="section-title">Addon Manifest</div>
+    <h2 class="section-title">Addon Manifest</h2>
 
     <div class="table-wrap">
       <table>
