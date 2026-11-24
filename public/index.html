@@ -3,427 +3,542 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BG Live TV — Stremio Addon</title>
+  <title>BG Live TV for Stremio</title>
+  <meta name="description" content="Bulgarian live TV channels in Stremio, with now and next programme info." />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0c1a16" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" href="/images/logo.png" type="image/png" />
+  <link rel="preload" href="/fonts/sofia-sans-extra-condensed-latin.woff2" as="font" type="font/woff2" crossorigin />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Sofia Sans: Bulgarian Cyrillic for the programme titles. SIL OFL, see /fonts/OFL.txt */
+    @font-face {
+      font-family: 'Sofia Sans'; font-weight: 400 700; font-display: swap;
+      src: url('/fonts/sofia-sans-latin.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212;
+    }
+    @font-face {
+      font-family: 'Sofia Sans'; font-weight: 400 700; font-display: swap;
+      src: url('/fonts/sofia-sans-cyrillic.woff2') format('woff2');
+      unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+    }
+    @font-face {
+      font-family: 'Sofia Sans Extra Condensed'; font-weight: 600 900; font-display: swap;
+      src: url('/fonts/sofia-sans-extra-condensed-latin.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212;
+    }
 
+    /* The page is the flag: a white, a green and a red band */
     :root {
-      --bg: #0f0f13;
-      --surface: #18181f;
-      --border: #2a2a35;
-      --accent: #7b5ea7;
-      --accent-bright: #a97fd4;
-      --text: #e8e8f0;
-      --muted: #888899;
-      --green: #4caf7d;
+      color-scheme: light dark;
+      --white: #ffffff;
+      --ink: #10211c;
+      --ink-soft: #51625c;
+      --line: #d5dedb;
+      --field: #f0f5f3;
+      --green: #00704f;
+      --green-deep: #00563c;
+      --green-soft: #c3e6d9;
+      --red: #cb2416;
+      --red-deep: #a5190d;
+      --body: 'Sofia Sans', 'Segoe UI', Roboto, sans-serif;
+      --display: 'Sofia Sans Extra Condensed', 'Arial Narrow', 'Sofia Sans', sans-serif;
+      --gutter: clamp(20px, 5vw, 64px);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --white: #0c1a16;
+        --ink: #f1f7f4;
+        --ink-soft: #a3b8b0;
+        --line: #2a3f38;
+        --field: #152822;
+        --green: #005e42;
+        --green-deep: #00482f;
+        --red: #b51f12;
+        --red-deep: #8e150a;
+      }
     }
 
+    *, *::before, *::after { box-sizing: border-box; }
+    body, h1, h2, h3, p, ol, ul { margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
+      font: 400 1.0625rem/1.5 var(--body);
+      color: var(--ink);
+      background: var(--white);
     }
+    img { display: block; max-width: 100%; }
+    button, input { font: inherit; color: inherit; }
+    a { color: inherit; text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+    :focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+    .wrap { max-width: 1280px; margin: 0 auto; padding-inline: var(--gutter); }
 
-    /* ── HERO ── */
+    h1, h2 {
+      font-family: var(--display);
+      font-weight: 900;
+      line-height: 0.94;
+      letter-spacing: -0.005em;
+      text-wrap: balance;
+    }
+    h2 { font-size: clamp(2.75rem, 5.5vw, 4.5rem); }
+
+    /* White band: the TV and the install button */
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 20px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; text-decoration: none; }
+    .brand img { width: 40px; height: 40px; }
+    .top nav { display: flex; gap: 24px; }
+    .top nav a { text-decoration: none; }
+    .top nav a:hover { text-decoration: underline; }
+
     .hero {
-      text-align: center;
-      padding: 80px 20px 60px;
-      background: radial-gradient(ellipse 80% 60% at 50% 0%, #2a1a4a 0%, transparent 70%);
-    }
-
-    .hero-title-row {
-      display: inline-flex;
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: clamp(32px, 5vw, 80px);
       align-items: center;
-      gap: 16px;
-      margin-bottom: 16px;
+      padding-block: clamp(24px, 4vw, 56px) clamp(56px, 8vw, 112px);
     }
+    h1 { font-size: clamp(4rem, 8.4vw, 7.5rem); }
+    .lede { margin-top: 24px; font-size: 1.1875rem; max-width: 34ch; color: var(--ink-soft); }
 
-    .hero-logo {
-      width: 64px;
-      height: 64px;
-      object-fit: contain;
-      flex-shrink: 0;
-    }
-
-    .badge {
+    .install { margin-top: 32px; max-width: 460px; }
+    .button {
       display: inline-block;
-      background: rgba(123, 94, 167, 0.25);
-      border: 1px solid var(--accent);
-      color: var(--accent-bright);
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 4px 12px;
-      border-radius: 20px;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      font-size: clamp(2rem, 5vw, 3.2rem);
+      padding: 14px 26px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--red);
+      color: #fff;
       font-weight: 700;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #fff 40%, var(--accent-bright));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0;
-    }
-
-    .hero p {
-      font-size: 1.1rem;
-      color: var(--muted);
-      max-width: 520px;
-      margin: 0 auto 40px;
-    }
-
-    /* ── INSTALL BOX ── */
-    .install-box {
-      max-width: 580px;
-      margin: 0 auto 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px 24px;
-    }
-
-    .install-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    .url-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .url-display {
-      flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 0.85rem;
-      color: var(--accent-bright);
-      word-break: break-all;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
-      border: none;
-      white-space: nowrap;
-    }
-    .btn:hover { opacity: 0.85; }
-    .btn:active { transform: scale(0.97); }
-
-    .btn-copy {
-      background: var(--accent);
-      color: #fff;
-    }
-    .btn-copy.copied {
-      background: var(--green);
-    }
-
-    .btn-install {
-      background: linear-gradient(135deg, #7b5ea7, #5a3d8a);
-      color: #fff;
-      font-size: 1rem;
-      padding: 13px 28px;
-      border-radius: 10px;
+      font-size: 1.125rem;
       text-decoration: none;
+      cursor: pointer;
     }
-
-    .hint {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-top: 12px;
-    }
-    .hint a { color: var(--accent-bright); text-decoration: none; }
-    .hint a:hover { text-decoration: underline; }
-
-    /* ── FEATURES ── */
-    .section {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 60px 20px;
-    }
-
-    .section-title {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 32px;
-      color: var(--text);
-    }
-
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-    }
-
-    .feature {
-      background: var(--surface);
-      border: 1px solid var(--border);
+    .button:hover { background: var(--red-deep); }
+    .button:focus-visible { outline-color: var(--ink); }
+    .copy-label { margin-top: 22px; color: var(--ink-soft); font-size: 0.9375rem; }
+    .copy {
+      display: flex;
+      margin-top: 8px;
       border-radius: 12px;
-      padding: 20px;
-    }
-
-    .feature-icon {
-      font-size: 1.6rem;
-      margin-bottom: 12px;
-    }
-
-    .feature h3 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .feature p {
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-
-    /* ── CHANNELS ── */
-    .channels-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-      gap: 12px;
-    }
-
-    .channel-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 8px;
-      text-align: center;
-      transition: border-color 0.15s;
-    }
-    .channel-card:hover { border-color: var(--accent); }
-
-    .channel-card img {
-      width: 52px;
-      height: 52px;
-      object-fit: contain;
-      border-radius: 6px;
-      background: #111;
-    }
-
-    .channel-card span {
-      display: block;
-      font-size: 0.65rem;
-      color: var(--muted);
-      margin-top: 6px;
+      background: var(--field);
       overflow: hidden;
-      text-overflow: ellipsis;
+    }
+    .copy code {
+      flex: 1;
+      min-width: 0;
+      padding: 12px 16px;
+      font: inherit;
+      font-size: 1rem;
+      overflow-x: auto;
       white-space: nowrap;
+      scrollbar-width: none;
     }
-
-    .channels-loader {
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    /* ── HOW IT WORKS ── */
-    .steps {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .step {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-    }
-
-    .step-num {
-      flex-shrink: 0;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
+    .copy button {
+      flex: none;
+      min-width: 84px;
+      padding: 0 18px;
+      border: 0;
+      background: transparent;
+      color: var(--green);
       font-weight: 700;
+      cursor: pointer;
     }
+    @media (prefers-color-scheme: dark) { .copy button { color: #6ed3ae; } }
+    .copy button:hover { text-decoration: underline; }
+    .copy button:focus-visible { outline-offset: -4px; border-radius: 12px; }
 
-    .step-body h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
-    .step-body p  { font-size: 0.85rem; color: var(--muted); }
-
-    /* ── FOOTER ── */
-    footer {
-      text-align: center;
-      padding: 32px 20px;
-      border-top: 1px solid var(--border);
-      font-size: 0.8rem;
-      color: var(--muted);
+    /* The TV */
+    .tv-bezel {
+      padding: clamp(8px, 1.1vw, 14px);
+      border-radius: clamp(10px, 1.2vw, 18px);
+      background: #1b2124;
+      box-shadow: inset 0 0 0 1px #3a4448, 0 30px 60px -30px rgb(6 40 29 / 0.55);
     }
+    .screen {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 4px;
+      background: #16171d;
+      color: #fff;
+    }
+    .screen-tile {
+      position: absolute;
+      inset: 0 0 24%;
+      margin: auto;
+      height: 100%;
+      aspect-ratio: 1;
+      object-fit: contain;
+    }
+    .banner {
+      position: absolute;
+      inset: auto 0 0;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 0 clamp(12px, 2vw, 24px);
+      align-items: center;
+      min-height: 29%;
+      padding: clamp(10px, 1.4vw, 18px) clamp(14px, 2vw, 26px);
+      background: #0b1512;
+    }
+    .banner-number {
+      min-width: 0.8em;
+      font: 900 clamp(2.5rem, 5.2vw, 4.75rem)/0.8 var(--display);
+      font-variant-numeric: tabular-nums;
+    }
+    .banner-head { display: flex; justify-content: space-between; gap: 16px; font-size: clamp(0.8125rem, 1.1vw, 1rem); color: #bccac4; }
+    .banner-now { font-weight: 700; font-size: clamp(1rem, 1.6vw, 1.375rem); line-height: 1.25; }
+    .banner-now, .banner-next, .banner-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .banner-next { font-size: clamp(0.8125rem, 1.1vw, 1rem); color: #bccac4; }
+    .banner-time { flex: none; font-variant-numeric: tabular-nums; }
+    .bar { height: 4px; border-radius: 2px; background: #ffffff38; overflow: hidden; }
+    .bar i { display: block; height: 100%; background: #ff4a38; }
+    .banner .bar { margin-block: 6px; }
 
-    /* ── DIVIDER ── */
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 0;
+    .stand { width: 22%; height: clamp(14px, 2vw, 24px); margin: 0 auto; background: #2a3236; clip-path: polygon(34% 0, 66% 0, 66% 60%, 100% 100%, 0 100%, 34% 60%); }
+    .remote { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+    .remote button {
+      padding: 9px 20px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .remote button:hover { background: var(--field); }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .tv.on .screen { animation: power-on 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+      .zap .screen-tile { animation: zap 0.22s ease-out; }
+    }
+    @keyframes power-on {
+      0% { clip-path: inset(49.6% 48%); filter: brightness(4); }
+      45% { clip-path: inset(49.6% 0); filter: brightness(4); }
+      100% { clip-path: inset(0); filter: none; }
+    }
+    @keyframes zap { from { opacity: 0; } }
+
+    /* Green band: the guide */
+    .guide { background: var(--green); color: #fff; padding-block: clamp(56px, 7vw, 96px); }
+    .guide-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 24px; }
+    .guide-head p { margin-top: 14px; color: var(--green-soft); max-width: 52ch; }
+    .search {
+      width: min(100%, 320px);
+      padding: 13px 20px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--green-deep);
+      color: #fff;
+    }
+    .search::placeholder { color: var(--green-soft); opacity: 1; }
+    .channels {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+      gap: 8px 32px;
+      margin-top: 40px;
+    }
+    .channel {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      margin-inline: -10px;
+      padding: 10px;
+      border-radius: 18px;
+      text-decoration: none;
+      content-visibility: auto;
+      contain-intrinsic-size: auto 92px;
+    }
+    .channel:hover { background: var(--green-deep); }
+    .channel:focus-visible { outline-offset: -3px; }
+    .channel img { width: 72px; height: 72px; border-radius: 12px; object-fit: contain; background: #16171d; }
+    .channel-head { display: flex; justify-content: space-between; gap: 12px; font-size: 0.9375rem; color: var(--green-soft); }
+    .channel-head span:last-child { flex: none; font-variant-numeric: tabular-nums; }
+    .channel-now { font-weight: 600; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .channel .bar { margin-top: 8px; }
+    .channel .bar i { background: #fff; }
+    .message { margin-top: 40px; font-size: 1.125rem; }
+    .message[hidden] { display: none; }
+
+    /* Red band: setup */
+    .setup { background: var(--red); color: #fff; padding-block: clamp(56px, 7vw, 96px) 32px; }
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 32px clamp(32px, 5vw, 72px); margin-top: 40px; list-style: none; counter-reset: step; }
+    .steps li { counter-increment: step; }
+    .steps li::before { content: counter(step); font: 900 3.5rem/1 var(--display); }
+    .steps h3 { margin-top: 6px; font-size: 1.25rem; line-height: 1.3; }
+    .steps p { margin-top: 4px; max-width: 38ch; }
+    .setup .steps strong { overflow-wrap: anywhere; }
+    footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 32px; margin-top: clamp(56px, 7vw, 96px); padding-top: 24px; border-top: 1px solid #ffffff4d; font-size: 0.9375rem; }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: minmax(0, 1fr); padding-top: 12px; }
+      .install { max-width: none; }
+    }
+    @media (max-width: 560px) {
+      .top nav a:not(:last-child) { display: none; }
+      .button { display: block; text-align: center; }
+      .screen { aspect-ratio: 4 / 3; }
+      .search { width: 100%; }
     }
   </style>
 </head>
 <body>
 
-  <!-- HERO -->
-  <section class="hero">
-    
-    <div class="hero-title-row">
-      <img src="/images/logo.png" alt="BG Live TV Logo" class="hero-logo" />
-      <h1>BG Live TV</h1>
-    </div>
-    <br/>
-    <div class="badge">Stremio Addon</div> 
-      
-    <p> 65+ Bulgarian live TV channels — BTV, BNT, Nova, Eurosport, Max Sport and more — directly in Stremio. Free, no account needed.</p>
+  <header class="wrap top">
+    <a class="brand" href="/"><img src="/images/logo.png" alt="" width="40" height="40" />BG Live TV</a>
+    <nav aria-label="Page">
+      <a href="#guide">On now</a>
+      <a href="#setup">Setup</a>
+      <a href="https://github.com/hjelev/bgtv-stremio" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
 
-    <div class="install-box">
-      <div class="install-label">Manifest URL</div>
-      <div class="url-row">
-        <div class="url-display" id="manifest-url">loading…</div>
-        <button class="btn btn-copy" id="copy-btn" onclick="copyUrl()">Copy</button>
-      </div>
-      <p class="hint">
-        Open Stremio → Addons → <strong style="color:var(--text)">Install from URL</strong> → paste the URL above.<br>
-        Or <a href="#" id="stremio-link">click here</a> to install automatically.
-      </p>
-    </div>
-  </section>
-
-  <hr class="divider" />
-
-  <!-- FEATURES -->
-  <div class="section">
-    <div class="section-title">Features</div>
-    <div class="features">
-      <div class="feature">
-        <div class="feature-icon">📺</div>
-        <h3>65+ Live Channels</h3>
-        <p>Full Bulgarian TV lineup — news, sports, entertainment, kids.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">⚡</div>
-        <h3>HLS Streams</h3>
-        <p>High-quality .m3u8 streams fetched fresh on every play request.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">📱</div>
-        <h3>All Devices</h3>
-        <p>Works on PC, Android TV, Fire TV Stick, and any Stremio client.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🔓</div>
-        <h3>No Account</h3>
-        <p>No registration, no subscription. Self-hosted on your own server.</p>
-      </div>
-    </div>
-  </div>
-
-  <hr class="divider" />
-
-  <!-- CHANNELS -->
-  <div class="section">
-    <div class="section-title">Available Channels</div>
-    <div class="channels-grid" id="channels-grid">
-      <p class="channels-loader">Loading channels…</p>
-    </div>
-  </div>
-
-  <hr class="divider" />
-
-  <!-- HOW IT WORKS -->
-  <div class="section">
-    <div class="section-title">How it works</div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <h3>Catalog</h3>
-          <p>The addon scrapes the channel list from the source site and serves it as a Stremio TV catalog — with names and logos.</p>
+  <main>
+    <section class="wrap hero">
+      <div>
+        <h1>Bulgarian TV, live in Stremio</h1>
+        <p class="lede"><span id="count">65+</span> channels with what’s on now and next. Free, and no account needed.</p>
+        <div class="install">
+          <a class="button" id="stremio-link" href="#setup">Install in Stremio</a>
+          <p class="copy-label" id="copy-label">Or add it by URL on any device</p>
+          <div class="copy">
+            <code id="manifest-url" tabindex="0" aria-labelledby="copy-label">/manifest.json</code>
+            <button type="button" id="copy-btn" aria-live="polite">Copy</button>
+          </div>
         </div>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <h3>Stream extraction</h3>
-          <p>When you pick a channel, the addon fetches that channel's page and extracts the embedded HLS stream URL in real time.</p>
+
+      <div class="tv" id="tv">
+        <div class="tv-bezel">
+          <div class="screen" id="screen">
+            <img class="screen-tile" id="tv-tile" src="/images/logo.png" alt="" />
+            <div class="banner">
+              <div class="banner-number" id="tv-number"></div>
+              <div>
+                <div class="banner-head"><span class="banner-name" id="tv-name">BG Live TV</span><span class="banner-time" id="tv-time"></span></div>
+                <div class="banner-now" id="tv-now" lang="bg">Loading channels…</div>
+                <div class="bar" id="tv-bar" hidden><i></i></div>
+                <div class="banner-next" id="tv-next" lang="bg"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="stand"></div>
+        <div class="remote">
+          <button type="button" id="ch-down" aria-label="Previous channel">CH −</button>
+          <button type="button" id="ch-up" aria-label="Next channel">CH +</button>
         </div>
       </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <h3>Playback</h3>
-          <p>Stremio receives a fresh, time-limited .m3u8 URL and starts playback immediately — no buffering layers or intermediaries.</p>
+    </section>
+
+    <section class="guide" id="guide">
+      <div class="wrap">
+        <div class="guide-head">
+          <div>
+            <h2>On now</h2>
+            <p>It’s <span id="clock">--:--</span> in Sofia. Once the addon is installed, pick a channel to open it in Stremio.</p>
+          </div>
+          <input class="search" id="search" type="search" placeholder="Find a channel or show" aria-label="Find a channel or show" autocomplete="off" />
         </div>
+        <ul class="channels" id="channels"></ul>
+        <p class="message" id="message" role="status">Loading channels…</p>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <hr class="divider" />
-
-  <footer>
-    BG Live TV Stremio Addon &mdash; self-hosted, open source &mdash;
-    <a href="https://github.com/hjelev/bgtv-stremio" target="_blank" rel="noopener" style="color:var(--accent-bright);text-decoration:none;">GitHub</a>
-  </footer>
+    <section class="setup" id="setup">
+      <div class="wrap">
+        <h2>Set it up on your TV</h2>
+        <ol class="steps">
+          <li><h3>Open Addons</h3><p>In Stremio, choose the puzzle-piece icon, then Install from URL.</p></li>
+          <li><h3>Enter the address</h3><p>Type <strong id="setup-url">/manifest.json</strong> and choose Install.</p></li>
+          <li><h3>Start watching</h3><p>Open the TV section and choose the BG Live TV catalog.</p></li>
+        </ol>
+        <footer>
+          <span>BG Live TV is a self-hosted, open source addon.</span>
+          <a href="https://github.com/hjelev/bgtv-stremio" target="_blank" rel="noopener">Source code on GitHub</a>
+        </footer>
+      </div>
+    </section>
+  </main>
 
   <script>
-    // Set manifest URL dynamically based on how this page was reached
-    const manifestUrl = window.location.origin + '/manifest.json';
-    document.getElementById('manifest-url').textContent = manifestUrl;
-    document.getElementById('stremio-link').href = 'stremio://' + window.location.host + '/manifest.json';
+    const $ = id => document.getElementById(id);
+    const manifestUrl = location.origin + '/manifest.json';
+    $('manifest-url').textContent = manifestUrl;
+    $('setup-url').textContent = manifestUrl;
+    $('stremio-link').href = 'stremio://' + location.host + '/manifest.json';
 
-    function copyUrl() {
-      navigator.clipboard.writeText(manifestUrl).then(() => {
-        const btn = document.getElementById('copy-btn');
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = 'Copy';
-          btn.classList.remove('copied');
-        }, 2000);
-      });
+    // navigator.clipboard only exists on https/localhost; LAN installs need the fallback
+    async function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+      const area = Object.assign(document.createElement('textarea'), { value: text });
+      area.style.cssText = 'position:fixed;opacity:0';
+      document.body.append(area);
+      area.focus();
+      area.select();
+      const ok = document.execCommand('copy');
+      area.remove();
+      if (!ok) throw new Error('copy blocked');
     }
 
-    // Load channels from the catalog endpoint
-    fetch('/catalog/tv/bg_tv.json')
-      .then(r => r.json())
-      .then(data => {
-        const grid = document.getElementById('channels-grid');
-        const metas = data.metas || [];
-        if (!metas.length) { grid.innerHTML = '<p class="channels-loader">No channels found.</p>'; return; }
-        grid.innerHTML = metas.map(ch => `
-          <div class="channel-card">
-            <img src="${ch.logo}" alt="${ch.name}" loading="lazy" onerror="this.style.display='none'">
-            <span>${ch.name}</span>
-          </div>
-        `).join('');
-      })
-      .catch(() => {
-        document.getElementById('channels-grid').innerHTML = '<p class="channels-loader">Could not load channels.</p>';
+    $('copy-btn').addEventListener('click', async () => {
+      const btn = $('copy-btn');
+      try {
+        await copyText(manifestUrl);
+        btn.textContent = 'Copied';
+      } catch {
+        getSelection().selectAllChildren($('manifest-url'));
+        btn.textContent = 'Selected'; // ready for a manual copy
+      }
+      setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+    });
+
+    // Guide times are shown in Sofia time, like in the addon itself
+    const timeFormat = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'Europe/Sofia' });
+    const time = ms => timeFormat.format(ms);
+    const progress = p => Math.max(0, Math.min(100, (Date.now() - p.start) / (p.stop - p.start) * 100)) + '%';
+
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    let channels = [];
+    let guide = {};
+    let current = 0;
+
+    /* TV */
+
+    // Fill the screen with the tile's own background colour
+    const tile = $('tv-tile');
+    tile.addEventListener('load', () => {
+      try {
+        const canvas = Object.assign(document.createElement('canvas'), { width: 1, height: 1 });
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(tile, 4, 4, 1, 1, 0, 0, 1, 1);
+        const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+        $('screen').style.backgroundColor = a ? `rgb(${r} ${g} ${b})` : '';
+      } catch { // cross-origin image
+        $('screen').style.backgroundColor = '';
+      }
+      tile.style.visibility = '';
+    });
+    tile.addEventListener('error', () => { tile.style.visibility = 'hidden'; });
+
+    function showBanner() {
+      const ch = channels[current];
+      if (!ch) return;
+      const { now, next } = guide[ch.id] || {};
+      $('tv-number').textContent = current + 1;
+      $('tv-name').textContent = ch.name;
+      $('tv-time').textContent = now ? `${time(now.start)}–${time(now.stop)}` : '';
+      $('tv-now').textContent = now ? now.title : 'No programme info';
+      $('tv-now').lang = now ? 'bg' : 'en';
+      $('tv-bar').hidden = !now;
+      if (now) $('tv-bar').firstElementChild.style.width = progress(now);
+      $('tv-next').textContent = next ? `${time(next.start)} ${next.title}` : '';
+    }
+
+    function tune(index) {
+      if (!channels.length) return;
+      current = (index + channels.length) % channels.length;
+      const tv = $('tv');
+      tv.classList.remove('zap');
+      void tv.offsetWidth; // restart the animation
+      tv.classList.add('zap');
+      if (channels[current].logo) tile.src = channels[current].logo;
+      else tile.style.visibility = 'hidden';
+      showBanner();
+    }
+
+    $('ch-up').addEventListener('click', () => tune(current + 1));
+    $('ch-down').addEventListener('click', () => tune(current - 1));
+
+    /* Guide */
+
+    function renderGuide() {
+      const query = $('search').value.trim().toLowerCase();
+      const shown = channels.filter(ch => {
+        const { now, next } = guide[ch.id] || {};
+        return [ch.name, now && now.title, next && next.title].some(s => s && s.toLowerCase().includes(query));
       });
+
+      $('channels').replaceChildren(...shown.map(ch => {
+        const { now } = guide[ch.id] || {};
+        const img = Object.assign(el('img'), { alt: '', loading: 'lazy', width: 72, height: 72 });
+        img.addEventListener('error', () => { img.style.visibility = 'hidden'; });
+        if (ch.logo) img.src = ch.logo; else img.style.visibility = 'hidden';
+
+        const head = el('div', 'channel-head');
+        head.append(el('span', '', ch.name), el('span', '', now ? `until ${time(now.stop)}` : ''));
+        const title = el('div', 'channel-now', now ? now.title : 'No programme info');
+        if (now) { title.lang = 'bg'; title.title = now.title; }
+        const text = el('div');
+        text.append(head, title);
+        if (now) {
+          const bar = el('div', 'bar');
+          const fill = el('i');
+          fill.style.width = progress(now);
+          bar.append(fill);
+          text.append(bar);
+        }
+
+        const link = el('a', 'channel');
+        link.href = 'stremio:///detail/tv/' + encodeURIComponent(ch.id);
+        link.append(img, text);
+        const item = el('li');
+        item.append(link);
+        return item;
+      }));
+
+      $('message').hidden = shown.length > 0;
+      if (!shown.length) $('message').textContent = `Nothing matches “${$('search').value.trim()}”. Try a channel name, like BNT, or a show title in Bulgarian.`;
+    }
+
+    $('search').addEventListener('input', () => { if (channels.length) renderGuide(); });
+
+    // Logos are served by this addon, so load them relative to this page
+    function localPath(logo) {
+      if (!logo) return null;
+      const url = new URL(logo, location.href);
+      return url.pathname.startsWith('/images/') ? url.pathname : logo;
+    }
+
+    const getJson = url => fetch(url).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+
+    async function refreshGuide() {
+      $('clock').textContent = time(Date.now());
+      guide = await getJson('/guide.json').catch(() => guide);
+      if (!channels.length) return;
+      renderGuide();
+      showBanner();
+    }
+
+    async function load() {
+      try {
+        const [catalog] = await Promise.all([getJson('/catalog/tv/bg_tv.json'), refreshGuide()]);
+        channels = (catalog.metas || []).map(ch => ({
+          id: ch.id,
+          name: (ch.name || ch.id).replace(/\s+HD$/i, ''),
+          logo: localPath(ch.logo),
+        }));
+        if (!channels.length) throw new Error('empty catalog');
+        $('count').textContent = channels.length;
+        renderGuide();
+        tune(0);
+      } catch {
+        const text = 'The channel list can’t be loaded right now. Reload the page in a minute.';
+        $('message').textContent = text;
+        $('tv-now').textContent = 'No signal';
+        $('tv-now').lang = 'en';
+      }
+      $('tv').classList.add('on');
+    }
+
+    load();
+    setInterval(refreshGuide, 60 * 1000);
   </script>
 </body>
 </html>

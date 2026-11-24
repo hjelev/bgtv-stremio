@@ -139,6 +139,21 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Now/next for every channel, keyed by catalog id (used by the landing page)
+app.get('/guide.json', async (req, res) => {
+  const pick = p => p && { start: p.start, stop: p.stop, title: p.title };
+  const guide = {};
+  try {
+    for (const { id } of await getCatalog()) {
+      const epg = getNowNext(id.slice(ID_PREFIX.length));
+      if (epg) guide[id] = { now: pick(epg.now), next: pick(epg.next) };
+    }
+  } catch (err) {
+    console.error('Guide error:', err.message);
+  }
+  res.set('Cache-Control', 'public, max-age=60').json(guide);
+});
+
 // Static assets (images, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
 

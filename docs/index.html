@@ -8,7 +8,8 @@
   <meta name="keywords" content="Stremio addon, Bulgarian TV, live TV, BTV, BNT, Nova, Eurosport, Max Sport, IPTV, HLS, m3u8, self-hosted" />
   <meta name="author" content="hjelev" />
   <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#0f0f13" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0c1a16" media="(prefers-color-scheme: dark)" />
   <link rel="canonical" href="https://masoko.net/bgtv-stremio/" />
   <link rel="icon" href="logo.png" type="image/png" />
 
@@ -46,357 +47,211 @@
   }
   </script>
 
+  <link rel="preload" href="fonts/sofia-sans-extra-condensed-latin.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="styles.css" />
  <script defer src="https://m.masoko.net/core-util" data-website-id="430d1083-f809-45b2-b7db-b4b5146b8969"></script>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <a class="nav-brand" href="/bgtv-stremio/">
-      <img src="logo.png" alt="BG Live TV logo" />
-      BG Live TV
-    </a>
-    <ul class="nav-links">
-      <li><a href="#install">Install</a></li>
-      <li><a href="#features">Features</a></li>
-      <li><a href="#how-it-works">How it works</a></li>
-      <li><a href="https://github.com/hjelev/bgtv-stremio" target="_blank" rel="noopener">GitHub</a></li>
-    </ul>
-  </nav>
+  <header class="wrap top">
+    <a class="brand" href="/bgtv-stremio/"><img src="logo.png" alt="" width="40" height="40" />BG Live TV</a>
+    <nav aria-label="Page">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/hjelev/bgtv-stremio" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="badge">Stremio Addon</div><br />
-    <div class="hero-title-row">
-      <img src="logo.png" alt="BG Live TV Logo" class="hero-logo" />
-      <h1>BG Live TV</h1>
-    </div>
-    
-    <p class="hero-sub">65+ Bulgarian live TV channels — BTV, BNT, Nova, Eurosport, Max Sport and more — directly in Stremio. Free, no account needed.</p>
-    <div class="hero-actions">
-      <a href="#install" class="btn btn-primary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Get Started
-      </a>
-      <a href="https://tv.masoko.net/" target="_blank" rel="noopener" class="btn btn-secondary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
-        Live Demo
-      </a>
-      <a href="https://github.com/hjelev/bgtv-stremio" target="_blank" rel="noopener" class="btn btn-secondary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
-        View on GitHub
-      </a>
-    </div>
-  </section>
-
-  <hr class="divider" />
-
-  <!-- FEATURES -->
-  <div class="section" id="features">
-    <div class="section-label">What you get</div>
-    <h2 class="section-title">Features</h2>
-    <div class="features">
-      <div class="feature">
-        <div class="feature-icon">📺</div>
-        <h3>65+ Live Channels</h3>
-        <p>Full Bulgarian TV lineup — news, sports, entertainment, kids, and more.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">⚡</div>
-        <h3>HLS Streams</h3>
-        <p>High-quality <code>.m3u8</code> streams fetched fresh on every play request.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">📱</div>
-        <h3>All Devices</h3>
-        <p>Works on PC, Android TV, Fire TV Stick, and any Stremio client.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🔓</div>
-        <h3>No Account</h3>
-        <p>No registration, no subscription. Self-hosted on your own server.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🐳</div>
-        <h3>Docker Ready</h3>
-        <p>One command to spin up with Docker Compose. Zero config needed.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🖼️</div>
-        <h3>Channel Logos</h3>
-        <p>All channel logos downloaded locally — no external image dependencies.</p>
-      </div>
-    </div>
-  </div>
-
-  <hr class="divider" />
-
-  <!-- INSTALLATION -->
-  <div class="section" id="install">
-    <div class="section-label">Setup</div>
-    <h2 class="section-title">Installation</h2>
-
-    <div class="tabs">
-      <button class="tab-btn active" onclick="showTab('docker-compose')">Docker Compose</button>
-      <button class="tab-btn" onclick="showTab('docker')">Docker</button>
-      <button class="tab-btn" onclick="showTab('nodejs')">Node.js</button>
-    </div>
-
-    <!-- Docker Compose -->
-    <div class="tab-panel active" id="tab-docker-compose">
-      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:20px;">The recommended way. Requires <a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">Docker Compose</a>.</p>
-
-      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">1. Clone the repository</p>
-      <div class="code-block">
-        <div class="code-header">
-          <span>bash</span>
-          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+  <main>
+    <!-- HERO -->
+    <section class="wrap hero">
+      <div>
+        <h1>Bulgarian TV, live in Stremio</h1>
+        <p class="lede">65+ channels, including BTV, BNT, Nova, Eurosport and Max Sport, from an addon you host yourself.</p>
+        <div class="actions">
+          <a class="button" href="#install">Install the addon</a>
+          <a class="button button-quiet" href="https://tv.masoko.net/" target="_blank" rel="noopener">Open the live demo</a>
         </div>
-        <pre>git clone https://github.com/hjelev/bgtv-stremio.git
+      </div>
+      <div class="tv">
+        <div class="tv-bezel">
+          <img class="screen" src="channels.webp" width="1600" height="900" alt="Logos of all the channels in the addon, from BNT 1 and bTV to Eurosport and Disney Channel" />
+        </div>
+        <div class="stand"></div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="band green" id="features">
+      <div class="wrap">
+        <h2>Turn it on and watch</h2>
+        <ul class="features">
+          <li><h3>65+ live channels</h3><p>The full Bulgarian lineup: news, sports, film, music, kids and more.</p></li>
+          <li><h3>Now and next</h3><p>See what’s on in the catalog, on the channel page and next to the stream.</p></li>
+          <li><h3>Every Stremio device</h3><p>PC, Android TV, Fire TV Stick and any other Stremio client.</p></li>
+          <li><h3>No account</h3><p>No registration and no subscription. It runs on your own server.</p></li>
+          <li><h3>One command to start</h3><p>Docker Compose builds and runs it with nothing to configure.</p></li>
+          <li><h3>Sharp logos</h3><p>High-resolution channel logos, served from your own server.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="band" id="how-it-works">
+      <div class="wrap split">
+        <h2>How it works</h2>
+        <div>
+          <ol class="steps">
+            <li><h3>It lists the channels</h3><p>The addon reads the channel list from the source site with <code>cheerio</code> and serves it as a Stremio TV catalog. The list is cached for 1 hour.</p></li>
+            <li><h3>It finds the stream</h3><p>When you pick a channel, the addon fetches that channel’s page and extracts the HLS stream URL from the JWPlayer <code>file:"…"</code> script.</p></li>
+            <li><h3>Stremio plays it</h3><p>Stremio gets a fresh, time-limited <code>.m3u8</code> URL and plays it directly, with no server in between.</p></li>
+          </ol>
+
+          <h3 class="table-title" id="manifest">Addon manifest</h3>
+          <table aria-labelledby="manifest">
+            <tbody>
+              <tr><th scope="row">ID</th><td><code>org.custom.bgtv</code></td></tr>
+              <tr><th scope="row">Name</th><td>BG Live TV</td></tr>
+              <tr><th scope="row">Version</th><td><code>1.0.0</code></td></tr>
+              <tr><th scope="row">Type</th><td><code>tv</code></td></tr>
+              <tr><th scope="row">Catalog ID</th><td><code>bg_tv</code></td></tr>
+              <tr><th scope="row">ID prefix</th><td><code>bgtv_</code></td></tr>
+              <tr><th scope="row">Resources</th><td><code>catalog</code>, <code>meta</code>, <code>stream</code></td></tr>
+              <tr><th scope="row">Default port</th><td><code>7000</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- INSTALLATION -->
+    <section class="band tinted" id="install">
+      <div class="wrap split">
+        <div>
+          <h2>Run the addon</h2>
+          <p class="note">It starts at <code>http://localhost:7000</code>, whichever way you run it.</p>
+        </div>
+        <div>
+          <div class="tabs" role="tablist" aria-label="Installation method">
+            <button type="button" role="tab" id="tab-compose" aria-controls="panel-compose" aria-selected="true">Docker Compose</button>
+            <button type="button" role="tab" id="tab-docker" aria-controls="panel-docker" aria-selected="false" tabindex="-1">Docker</button>
+            <button type="button" role="tab" id="tab-node" aria-controls="panel-node" aria-selected="false" tabindex="-1">Node.js</button>
+          </div>
+
+          <div class="panel" role="tabpanel" id="panel-compose" aria-labelledby="tab-compose">
+            <p>The recommended way. Requires <a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">Docker Compose</a>.</p>
+            <h3>1. Clone the repository</h3>
+            <pre>git clone https://github.com/hjelev/bgtv-stremio.git
 cd bgtv-stremio</pre>
-      </div>
+            <h3>2. Start the addon</h3>
+            <pre>docker compose up -d --build</pre>
+            <h3>Useful commands</h3>
+            <pre>docker compose logs -f      # follow logs
+docker compose down         # stop and remove the container</pre>
+          </div>
 
-      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">2. Start the addon</p>
-      <div class="code-block">
-        <div class="code-header">
-          <span>bash</span>
-          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
-        </div>
-        <pre>docker compose up -d --build</pre>
-      </div>
-      <p class="code-note">The addon starts at <code style="color:var(--accent-bright)">http://localhost:7000</code></p>
-
-      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">Useful commands</p>
-      <div class="code-block">
-        <div class="code-header">
-          <span>bash</span>
-          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
-        </div>
-        <pre>docker compose logs -f      # follow logs
-docker compose down         # stop and remove the container
-docker compose pull         # pull latest image</pre>
-      </div>
-    </div>
-
-    <!-- Docker standalone -->
-    <div class="tab-panel" id="tab-docker">
-      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:20px;">Requires <a href="https://docs.docker.com/get-docker/" target="_blank" rel="noopener">Docker</a>.</p>
-
-      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">1. Build the image</p>
-      <div class="code-block">
-        <div class="code-header">
-          <span>bash</span>
-          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
-        </div>
-        <pre>git clone https://github.com/hjelev/bgtv-stremio.git
+          <div class="panel" role="tabpanel" id="panel-docker" aria-labelledby="tab-docker" hidden>
+            <p>Requires <a href="https://docs.docker.com/get-docker/" target="_blank" rel="noopener">Docker</a>.</p>
+            <h3>1. Build the image</h3>
+            <pre>git clone https://github.com/hjelev/bgtv-stremio.git
 cd bgtv-stremio
 docker build -t stremio-bgtv .</pre>
-      </div>
-
-      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">2. Run the container</p>
-      <div class="code-block">
-        <div class="code-header">
-          <span>bash</span>
-          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
-        </div>
-        <pre>docker run -d \
+            <h3>2. Run the container</h3>
+            <pre>docker run -d \
   --name stremio-bgtv \
   -p 7000:7000 \
   --restart unless-stopped \
   stremio-bgtv</pre>
-      </div>
-      <p class="code-note">The addon starts at <code style="color:var(--accent-bright)">http://localhost:7000</code></p>
-
-      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">Stop / remove</p>
-      <div class="code-block">
-        <div class="code-header">
-          <span>bash</span>
-          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
-        </div>
-        <pre>docker stop stremio-bgtv
+            <h3>Stop and remove</h3>
+            <pre>docker stop stremio-bgtv
 docker rm stremio-bgtv</pre>
-      </div>
-    </div>
+          </div>
 
-    <!-- Node.js -->
-    <div class="tab-panel" id="tab-nodejs">
-      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:20px;">Requires <a href="https://nodejs.org/" target="_blank" rel="noopener">Node.js</a> v18+ (use <a href="https://github.com/nvm-sh/nvm" target="_blank" rel="noopener">nvm</a> if needed).</p>
-
-      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">1. Clone and install dependencies</p>
-      <div class="code-block">
-        <div class="code-header">
-          <span>bash</span>
-          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
-        </div>
-        <pre>git clone https://github.com/hjelev/bgtv-stremio.git
+          <div class="panel" role="tabpanel" id="panel-node" aria-labelledby="tab-node" hidden>
+            <p>Requires <a href="https://nodejs.org/" target="_blank" rel="noopener">Node.js</a> v18 or newer (use <a href="https://github.com/nvm-sh/nvm" target="_blank" rel="noopener">nvm</a> if needed).</p>
+            <h3>1. Clone and install dependencies</h3>
+            <pre>git clone https://github.com/hjelev/bgtv-stremio.git
 cd bgtv-stremio
 npm install</pre>
-      </div>
-
-      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">2. Download channel logos</p>
-      <div class="code-block">
-        <div class="code-header">
-          <span>bash</span>
-          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
-        </div>
-        <pre>npm run download-images</pre>
-      </div>
-      <p class="code-note">Downloads all 65 channel logos to <code style="color:var(--accent-bright)">public/images/tvlogo/</code></p>
-
-      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">3. Start the server</p>
-      <div class="code-block">
-        <div class="code-header">
-          <span>bash</span>
-          <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
-        </div>
-        <pre>npm start</pre>
-      </div>
-      <p class="code-note">The addon starts at <code style="color:var(--accent-bright)">http://localhost:7000</code></p>
-    </div>
-  </div>
-
-  <hr class="divider" />
-
-  <!-- STREMIO INSTALL -->
-  <div class="section">
-    <div class="section-label">Add to Stremio</div>
-    <h2 class="section-title">Installing the Addon</h2>
-
-    <div class="install-callout">
-      <h3>Manifest URL</h3>
-      <div class="url-row">
-        <div class="url-display">http://localhost:7000/manifest.json</div>
-        <button class="btn-copy" id="copy-manifest-btn" onclick="copyManifest()">Copy URL</button>
-      </div>
-      <p class="install-hint">Replace <code>localhost</code> with your server's local IP to install from another device on the same network (e.g. <code>http://192.168.1.x:7000/manifest.json</code>).</p>
-    </div>
-
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <h3>Open Stremio</h3>
-          <p>Launch the Stremio app on any of your devices — PC, Android TV, Fire TV Stick, etc.</p>
+            <h3>2. Download fallback logos</h3>
+            <pre>npm run download-images</pre>
+            <h3>3. Start the server</h3>
+            <pre>npm start</pre>
+          </div>
         </div>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <h3>Go to Addons</h3>
-          <p>Click the puzzle-piece icon or navigate to <strong>Addons → Community Addons → Install from URL</strong>.</p>
+    </section>
+
+    <!-- STREMIO INSTALL -->
+    <section class="band red" id="add-to-stremio">
+      <div class="wrap">
+        <h2>Add it to Stremio</h2>
+        <div class="copy">
+          <code id="manifest-url">http://localhost:7000/manifest.json</code>
+          <button type="button" id="copy-manifest-btn" aria-live="polite">Copy</button>
         </div>
+        <p class="note">On another device, replace <strong>localhost</strong> with your server’s local IP, such as http://192.168.1.x:7000/manifest.json.</p>
+        <ol class="steps steps-row">
+          <li><h3>Open Addons</h3><p>In Stremio, choose the puzzle-piece icon, then Community Addons and Install from URL.</p></li>
+          <li><h3>Paste the manifest URL</h3><p>Use the address above, or your server’s IP, and choose Install.</p></li>
+          <li><h3>Start watching</h3><p>Open the TV section. Your channels are in the BG Live TV catalog.</p></li>
+        </ol>
+        <footer>
+          <span>BG Live TV is a self-hosted, open source addon.</span>
+          <a href="https://github.com/hjelev/bgtv-stremio" target="_blank" rel="noopener">Source code on GitHub</a>
+        </footer>
       </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <h3>Paste the manifest URL</h3>
-          <p>Enter <code>http://localhost:7000/manifest.json</code> (or your server's IP) and click <strong>Install</strong>.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <h3>Watch live TV</h3>
-          <p>Go to the <strong>TV</strong> section in Stremio — your Bulgarian live channels will appear under the <em>BG Live TV</em> catalog.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <hr class="divider" />
-
-  <!-- HOW IT WORKS -->
-  <div class="section" id="how-it-works">
-    <div class="section-label">Under the hood</div>
-    <h2 class="section-title">How it works</h2>
-
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <h3>Catalog</h3>
-          <p>The addon scrapes the channel list from the source site with <code>cheerio</code> and serves it as a Stremio TV catalog — complete with channel names and logos. Results are cached for 1 hour.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <h3>Stream extraction</h3>
-          <p>When you pick a channel, the addon fetches that channel's page and extracts the embedded HLS stream URL from the JWPlayer <code>file:"…"</code> script via regex — in real time.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <h3>Playback</h3>
-          <p>Stremio receives a fresh, time-limited <code>.m3u8</code> URL and starts playback immediately — no buffering layers or intermediaries.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <hr class="divider" />
-
-  <!-- MANIFEST -->
-  <div class="section">
-    <div class="section-label">Technical details</div>
-    <h2 class="section-title">Addon Manifest</h2>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>ID</td><td><code>org.custom.bgtv</code></td></tr>
-          <tr><td>Name</td><td>BG Live TV</td></tr>
-          <tr><td>Version</td><td><code>1.0.0</code></td></tr>
-          <tr><td>Type</td><td><code>tv</code></td></tr>
-          <tr><td>Catalog ID</td><td><code>bg_tv</code></td></tr>
-          <tr><td>ID prefix</td><td><code>bgtv_</code></td></tr>
-          <tr><td>Resources</td><td><code>catalog</code>, <code>meta</code>, <code>stream</code></td></tr>
-          <tr><td>Default port</td><td><code>7000</code></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <hr class="divider" />
-
-  <!-- FOOTER -->
-  <footer>
-    BG Live TV Stremio Addon &mdash; self-hosted, open source &mdash;
-    <a href="https://github.com/hjelev/bgtv-stremio" target="_blank" rel="noopener">GitHub</a>
-  </footer>
+    </section>
+  </main>
 
   <script>
-    function showTab(id) {
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('tab-' + id).classList.add('active');
-      event.currentTarget.classList.add('active');
+    // Tabs, with arrow keys
+    const tabs = [...document.querySelectorAll('[role="tab"]')];
+    function selectTab(tab) {
+      for (const t of tabs) {
+        const on = t === tab;
+        t.setAttribute('aria-selected', on);
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      }
     }
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => selectTab(tab));
+      tab.addEventListener('keydown', e => {
+        const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+        if (!step) return;
+        const next = tabs[(i + step + tabs.length) % tabs.length];
+        selectTab(next);
+        next.focus();
+      });
+    });
 
-    function copyCode(btn) {
-      const pre = btn.closest('.code-block').querySelector('pre');
-      navigator.clipboard.writeText(pre.textContent.trim()).then(() => {
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    function wireCopy(btn, source) {
+      btn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(source.textContent.trim());
+          btn.textContent = 'Copied';
+        } catch {
+          getSelection().selectAllChildren(source);
+          btn.textContent = 'Selected';
+        }
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
       });
     }
+    wireCopy(document.getElementById('copy-manifest-btn'), document.getElementById('manifest-url'));
 
-    function copyManifest() {
-      navigator.clipboard.writeText('http://localhost:7000/manifest.json').then(() => {
-        const btn = document.getElementById('copy-manifest-btn');
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = 'Copy URL'; btn.classList.remove('copied'); }, 2000);
-      });
+    for (const pre of document.querySelectorAll('pre')) {
+      const block = document.createElement('div');
+      const btn = document.createElement('button');
+      block.className = 'code-block';
+      btn.type = 'button';
+      btn.textContent = 'Copy';
+      btn.setAttribute('aria-live', 'polite');
+      pre.tabIndex = 0;
+      pre.replaceWith(block);
+      block.append(pre, btn);
+      wireCopy(btn, pre);
     }
   </script>
 </body>
