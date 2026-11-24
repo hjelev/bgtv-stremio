@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-COPY index.js scraper.js ./
+COPY index.js scraper.js epg.js ./
 COPY scripts ./scripts
 COPY public ./public
 

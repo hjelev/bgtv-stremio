@@ -5,6 +5,27 @@ const path = require('path');
 const { addonBuilder } = require('stremio-addon-sdk');
 const getRouter = require('stremio-addon-sdk/src/getRouter');
 const { getCatalog, getChannelById, getStream } = require('./scraper');
+const { startEpg, getNowNext, formatTime, formatRange } = require('./epg');
+
+const ID_PREFIX = 'bgtv_';
+// Seconds Stremio may cache now-playing info
+const EPG_CACHE_MAX_AGE = 5 * 60;
+
+// Cache until the current show ends, capped so guide updates show up quickly
+function epgCacheMaxAge(epg) {
+  if (!epg) return EPG_CACHE_MAX_AGE;
+  const left = Math.ceil((epg.now.stop - Date.now()) / 1000);
+  return Math.max(30, Math.min(EPG_CACHE_MAX_AGE, left));
+}
+
+function describe(channel, epg) {
+  if (!epg) return `Watch ${channel.name} live.`;
+  const { now, next } = epg;
+  const lines = [`▶ Сега · ${formatRange(now)}`, now.title];
+  if (next) lines.push('', `Следва · ${formatRange(next)}`, next.title);
+  if (now.desc && now.desc !== now.title) lines.push('', now.desc);
+  return lines.join('\n');
+}
 
 const manifest = {
   id: 'org.custom.bgtv',
@@ -25,8 +46,13 @@ const builder = new addonBuilder(manifest);
 builder.defineCatalogHandler(async ({ type, id }) => {
   if (type !== 'tv' || id !== 'bg_tv') return { metas: [] };
   try {
-    const metas = await getCatalog();
-    return { metas };
+    const channels = await getCatalog();
+    const metas = channels.map(channel => {
+      const epg = getNowNext(channel.id.slice(ID_PREFIX.length));
+      if (!epg) return channel;
+      return { ...channel, description: `▶ ${formatTime(epg.now.start)} ${epg.now.title}` };
+    });
+    return { metas, cacheMaxAge: EPG_CACHE_MAX_AGE };
   } catch (err) {
     console.error('Catalog error:', err.message);
     return { metas: [] };
@@ -38,6 +64,7 @@ builder.defineMetaHandler(async ({ type, id }) => {
   try {
     const channel = await getChannelById(id);
     if (!channel) return { meta: null };
+    const epg = getNowNext(id.slice(ID_PREFIX.length));
     return {
       meta: {
         id: channel.id,
@@ -47,8 +74,9 @@ builder.defineMetaHandler(async ({ type, id }) => {
         posterShape: 'square',
         background: channel.background,
         logo: channel.logo,
-        description: `Watch ${channel.name} live.`,
+        description: describe(channel, epg),
       },
+      cacheMaxAge: epgCacheMaxAge(epg),
     };
   } catch (err) {
     console.error('Meta error:', err.message);
@@ -58,14 +86,15 @@ builder.defineMetaHandler(async ({ type, id }) => {
 
 builder.defineStreamHandler(async ({ type, id }) => {
   if (type !== 'tv' || !id.startsWith('bgtv_')) return { streams: [] };
-  const channelId = id.slice('bgtv_'.length);
+  const channelId = id.slice(ID_PREFIX.length);
   try {
     const url = await getStream(channelId);
     if (!url) return { streams: [] };
+    const epg = getNowNext(channelId);
     return {
       streams: [
         {
-          title: 'Live Stream',
+          title: epg ? `Live Stream\n▶ Сега: ${epg.now.title} (${formatRange(epg.now)})` : 'Live Stream',
           url,
           behaviorHints: {
             notWebReady: false,
@@ -115,6 +144,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Addon routes (/manifest.json, /catalog/…, /meta/…, /stream/…)
 app.use(addonRouter);
+
+startEpg();
 
 const PORT = process.env.PORT || 7000;
 app.listen(PORT, () => {

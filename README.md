@@ -6,6 +6,7 @@ A Stremio addon that scrapes live Bulgarian TV channels from [seirsanduk.online]
 
 - 65 Bulgarian live TV channels (BTV, BNT, Nova, sports, kids, news, etc.)
 - Channel logos and thumbnails
+- Now/next programme info (EPG) in the catalog, channel page and stream title
 - Fresh HLS `.m3u8` stream URL fetched on every play request
 - No account or subscription required
 
@@ -90,6 +91,7 @@ To install on a TV or another device on the same network, replace `localhost` wi
 ├── docker-compose.yml
 ├── index.js               # Stremio addon server (manifest, catalog, meta, stream handlers)
 ├── scraper.js             # Web scraping logic (channel list + stream URL extraction)
+├── epg.js                 # Programme guide (what's on now / next)
 ├── scripts/
 │   └── download-images.js # Downloads all channel logos to public/images/tvlogo/
 ├── public/
@@ -103,6 +105,7 @@ To install on a TV or another device on the same network, replace `localhost` wi
 1. **Catalog handler** — fetches the seirsanduk.online homepage and uses `cheerio` to extract channel names, logos, and slugs from `/<slug>-online` links. Results are cached for 1 hour.
 2. **Meta handler** — returns channel name, poster, and logo when Stremio requests the detail page for a channel.
 3. **Stream handler** — fetches the channel's page and extracts the `.m3u8` URL from the embedded JWPlayer `file:"..."` script via regex. The URL is time-limited so it is fetched fresh on every play request.
+4. **EPG** — downloads the [open-epg.com](https://www.open-epg.com/) XMLTV guides (`bulgaria2.xml`, with `bulgaria1.xml` as fallback) at startup and every 6 hours in the background, and maps them to channels via the table in `epg.js`. Times are shown in Bulgarian time. If the guide is unavailable the addon works as before, without programme info.
 
 ## Tech Stack
 
