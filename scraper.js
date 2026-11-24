@@ -25,27 +25,32 @@ function imageUrl(src) {
 
 let catalogCache = null;
 
+// Channel links look like https://www.seirsanduk.online/<slug>-online
+// (older site layout: //www.seirsanduk.online/?id=<slug>&pass=&hash=)
+function channelSlug(href) {
+  const match = href.match(/[?&]id=([^&]+)/) || href.match(/(?:^|\/)([^/?#]+)-online\/?(?:[?#]|$)/);
+  return match ? match[1] : null;
+}
+
 async function getCatalog() {
   if (catalogCache) return catalogCache;
 
   const resp = await axios.get(BASE_URL + '/', { headers: HEADERS, timeout: 15000 });
   const $ = cheerio.load(resp.data);
   const channels = [];
+  const seen = new Set();
 
   $('a').each((_, el) => {
     const href = $(el).attr('href') || '';
     const img = $(el).find('img');
     if (!img.length) return;
 
-    // Channel links look like: //www.seirsanduk.online/?id=<slug>&pass=&hash=
-    const idMatch = href.match(/[?&]id=([^&]+)/);
-    if (!idMatch) return;
-
-    const channelId = idMatch[1];
+    const channelId = channelSlug(href);
     const name = $(el).text().trim();
     const thumb = img.attr('src') || '';
 
-    if (!channelId || channelId === 'index.php') return;
+    if (!channelId || channelId === 'index.php' || seen.has(channelId)) return;
+    seen.add(channelId);
 
     const poster = imageUrl(thumb);
     channels.push({
@@ -58,6 +63,12 @@ async function getCatalog() {
       logo: poster,
     });
   });
+
+  if (!channels.length) {
+    // Likely a site layout change; don't cache so we recover as soon as possible
+    console.error('Catalog: no channels found on', BASE_URL);
+    return channels;
+  }
 
   catalogCache = channels;
   // Expire cache after 1 hour so new channels are picked up

@@ -100,7 +100,7 @@ To install on a TV or another device on the same network, replace `localhost` wi
 
 ### How it works
 
-1. **Catalog handler** — fetches the seirsanduk.online homepage and uses `cheerio` to extract channel names, logos, and slugs from `?id=<slug>` links. Results are cached for 1 hour.
+1. **Catalog handler** — fetches the seirsanduk.online homepage and uses `cheerio` to extract channel names, logos, and slugs from `/<slug>-online` links. Results are cached for 1 hour.
 2. **Meta handler** — returns channel name, poster, and logo when Stremio requests the detail page for a channel.
 3. **Stream handler** — fetches the channel's page and extracts the `.m3u8` URL from the embedded JWPlayer `file:"..."` script via regex. The URL is time-limited so it is fetched fresh on every play request.
 
