@@ -14,7 +14,20 @@ const LOCAL_IMG_DIR = path.join(__dirname, 'public', 'images', 'tvlogo');
 // Placeholder hostname rewritten per-request by middleware in index.js
 const LOCAL_IMG_BASE = 'http://__host__/images/tvlogo';
 
-function imageUrl(src) {
+// High-res channel tiles committed to the repo, named by channelKey
+const TILE_DIR = path.join(__dirname, 'public', 'images', 'channels');
+const TILE_BASE = 'http://__host__/images/channels';
+
+// Site slug without the hd-/-hd decoration: hd-btv-hd -> btv
+function channelKey(slug) {
+  return slug.replace(/^hd-/, '').replace(/-hd$/, '');
+}
+
+function imageUrl(slug, src) {
+  const tile = path.basename(`${channelKey(slug)}.png`);
+  if (fs.existsSync(path.join(TILE_DIR, tile))) {
+    return `${TILE_BASE}/${tile}`;
+  }
   if (!src) return null;
   const filename = path.basename(src);
   if (fs.existsSync(path.join(LOCAL_IMG_DIR, filename))) {
@@ -52,7 +65,7 @@ async function getCatalog() {
     if (!channelId || channelId === 'index.php' || seen.has(channelId)) return;
     seen.add(channelId);
 
-    const poster = imageUrl(thumb);
+    const poster = imageUrl(channelId, thumb);
     channels.push({
       id: 'bgtv_' + channelId,
       type: 'tv',
@@ -99,4 +112,4 @@ async function getStream(channelId) {
   return null;
 }
 
-module.exports = { getCatalog, getChannelById, getStream };
+module.exports = { channelKey, getCatalog, getChannelById, getStream };

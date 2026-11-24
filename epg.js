@@ -1,6 +1,7 @@
 'use strict';
 
 const axios = require('axios');
+const { channelKey } = require('./scraper');
 
 // XMLTV guides from open-epg.com. bulgaria2 has the widest coverage and the
 // cleanest titles; bulgaria1 fills in channels it lacks (e.g. AXN).
@@ -14,7 +15,7 @@ const HEADERS = {
 const REFRESH_MS = 6 * 60 * 60 * 1000;
 const RETRY_MS = 10 * 60 * 1000;
 
-// Site slug (without the hd-/-hd decoration) -> channel id in [bulgaria2, bulgaria1]
+// channelKey(slug) -> channel id in [bulgaria2, bulgaria1]
 const CHANNELS = {
   '24-kitchen': ['24 Kitchen HD.bg', '24kitchen.bg'],
   '78-tv': ['7/8 TV HD.bg'],
@@ -163,7 +164,7 @@ function startEpg() {
 
 // Returns { now, next } for a site channel slug, or null if nothing is known to be on
 function getNowNext(slug, at = Date.now()) {
-  const key = slug.replace(/^hd-/, '').replace(/-hd$/, '');
+  const key = channelKey(slug);
   const [id2, id1] = Object.hasOwn(CHANNELS, key) ? CHANNELS[key] : [];
   for (const list of [guides[2].get(id2), guides[1].get(id1)]) {
     if (!list) continue;

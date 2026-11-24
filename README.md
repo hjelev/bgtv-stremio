@@ -5,7 +5,7 @@ A Stremio addon that scrapes live Bulgarian TV channels from [seirsanduk.online]
 ## Features
 
 - 65 Bulgarian live TV channels (BTV, BNT, Nova, sports, kids, news, etc.)
-- Channel logos and thumbnails
+- High-resolution (512×512) channel logos
 - Now/next programme info (EPG) in the catalog, channel page and stream title
 - Fresh HLS `.m3u8` stream URL fetched on every play request
 - No account or subscription required
@@ -96,7 +96,8 @@ To install on a TV or another device on the same network, replace `localhost` wi
 │   └── download-images.js # Downloads all channel logos to public/images/tvlogo/
 ├── public/
 │   ├── index.html         # Landing page served at http://<host>:7000/
-│   └── images/tvlogo/     # Locally hosted channel logos (65 PNG files)
+│   ├── images/channels/   # 512×512 channel logos, named by channel slug (preferred)
+│   └── images/tvlogo/     # Fallback: Locally hosted channel logos (65 PNG files)
 └── package.json
 ```
 
@@ -106,6 +107,8 @@ To install on a TV or another device on the same network, replace `localhost` wi
 2. **Meta handler** — returns channel name, poster, and logo when Stremio requests the detail page for a channel.
 3. **Stream handler** — fetches the channel's page and extracts the `.m3u8` URL from the embedded JWPlayer `file:"..."` script via regex. The URL is time-limited so it is fetched fresh on every play request.
 4. **EPG** — downloads the [open-epg.com](https://www.open-epg.com/) XMLTV guides (`bulgaria2.xml`, with `bulgaria1.xml` as fallback) at startup and every 6 hours in the background, and maps them to channels via the table in `epg.js`. Times are shown in Bulgarian time. If the guide is unavailable the addon works as before, without programme info.
+
+Channel logos come from [tv-logo/tv-logos](https://github.com/tv-logo/tv-logos), [iptv-org](https://github.com/iptv-org/database) and Wikimedia Commons, centred on a 512×512 tile. To add or replace one, drop a PNG named after the channel slug without `hd-`/`-hd` (e.g. `btv.png`) into `public/images/channels/`. Channels without a tile use the site's own small icon.
 
 ## Tech Stack
 
