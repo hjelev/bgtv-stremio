@@ -112,4 +112,4 @@ async function getStream(channelId) {
   return null;
 }
 
-module.exports = { channelKey, getCatalog, getChannelById, getStream };
+module.exports = { HEADERS, channelKey, getCatalog, getChannelById, getStream };

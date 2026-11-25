@@ -4,7 +4,8 @@ const express = require('express');
 const path = require('path');
 const { addonBuilder } = require('stremio-addon-sdk');
 const getRouter = require('stremio-addon-sdk/src/getRouter');
-const { getCatalog, getChannelById, getStream } = require('./scraper');
+const { getCatalog, getChannelById } = require('./scraper');
+const { getSource, getPlaylist } = require('./live');
 const { startEpg, getNowNext, formatTime, formatRange } = require('./epg');
 
 const ID_PREFIX = 'bgtv_';
@@ -88,20 +89,15 @@ builder.defineStreamHandler(async ({ type, id }) => {
   if (type !== 'tv' || !id.startsWith('bgtv_')) return { streams: [] };
   const channelId = id.slice(ID_PREFIX.length);
   try {
-    const url = await getStream(channelId);
-    if (!url) return { streams: [] };
+    if (!await getSource(channelId)) return { streams: [] };
     const epg = getNowNext(channelId);
     return {
       streams: [
         {
           title: epg ? `Live Stream\n▶ Сега: ${epg.now.title} (${formatRange(epg.now)})` : 'Live Stream',
-          url,
-          behaviorHints: {
-            notWebReady: false,
-            headers: {
-              'Referer': 'https://www.seirsanduk.online/',
-            },
-          },
+          // Permanent address; live.js keeps the expiring upstream URL behind it fresh
+          url: `http://__host__/live/${channelId}/index.m3u8`,
+          behaviorHints: { notWebReady: false },
         },
       ],
     };
@@ -154,6 +150,21 @@ app.get('/guide.json', async (req, res) => {
   res.set('Cache-Control', 'public, max-age=60').json(guide);
 });
 
+// HLS playlists: index.m3u8 for the channel, v<n>.m3u8 for its quality variants
+app.get('/live/:channel/:file', async (req, res, next) => {
+  const file = req.params.file.match(/^(?:index|v(\d{1,2}))\.m3u8$/);
+  if (!file || !/^[\w-]+$/.test(req.params.channel)) return next();
+  res.set({ 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' });
+  try {
+    const playlist = await getPlaylist(req.params.channel, file[1] === undefined ? null : Number(file[1]));
+    if (!playlist) return res.sendStatus(404);
+    res.type('application/vnd.apple.mpegurl').send(playlist);
+  } catch (err) {
+    console.error(`Live ${req.params.channel}:`, err.message);
+    res.sendStatus(503);
+  }
+});
+
 // Static assets (images, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -163,7 +174,9 @@ app.use(addonRouter);
 startEpg();
 
 const PORT = process.env.PORT || 7000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Addon running at http://localhost:${PORT}`);
   console.log(`Manifest: http://localhost:${PORT}/manifest.json`);
 });
+// Players poll playlists every ~6s; Node's default of 5s would drop the connection in between
+server.keepAliveTimeout = 65 * 1000;
